@@ -1,5 +1,10 @@
 import { User } from "@/types/types";
 import { Button } from "./ui/button";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 import useAuthStore from "@/store/auth";
 import { SentFriendRequest } from "@/store/sentFriendRequest";
@@ -7,7 +12,7 @@ import { RequestFriends } from "@/store/requestFriends";
 import { FriendLists } from "@/store/friends";
 import UnfriendDialog from "./unfriend-dialog";
 
-export default function UserItem({ id, name }: User) {
+export default function UserItem({ id, name, email }: User) {
   const { user } = useAuthStore();
   const { friends, confirmFriendsRequest, unFriend } = FriendLists();
   const { requestFriends, removeRequestFriend } = RequestFriends();
@@ -18,105 +23,24 @@ export default function UserItem({ id, name }: User) {
   const receivedRequest = !!requestFriends.find((item) => item.id === id);
   const sentRequst = !!sentFriendRequest.find((item) => item.id === id);
 
-  // Add Friend
-  // async function addFriend() {
-  //   const resp = await fetch("/api/user/addfriend", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ userOneId: user?.id, userTwoId: id }),
-  //   });
-  //   if (!resp.ok) {
-  //     const { messg } = await resp.json();
-  //     toast({ title: messg, variant: "destructive" });
-  //   } else {
-  //     const data = await resp.json();
-  //     toast({ title: data.messg });
-  //   }
-  // }
-
-  // Cancle Friend Request
-  // async function cancleFriendRequest() {
-  //   const resp = await fetch("/api/user/cancle", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ userOneId: user?.id, userTwoId: id }),
-  //   });
-  //   if (!resp.ok) {
-  //     const { messg } = await resp.json();
-  //     toast({ title: messg, variant: "destructive" });
-  //   } else {
-  //     const { messg, user } = await resp.json();
-  //     toast({ title: messg });
-  //   }
-  // }
-
-  // Accept Friend
-  // async function confirmFriendRequest() {
-  //   const resp = await fetch("/api/user/accept", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ userOneId: id, userTwoId: user?.id }),
-  //   });
-  //   if (!resp.ok) {
-  //     const { messg } = await resp.json();
-  //     toast({ title: messg, variant: "destructive" });
-  //   } else {
-  //     const data = await resp.json();
-  //     toast({ title: data.messg });
-  //   }
-  // }
-
-  // Remove Friend Request
-  // async function removeFriendRequest() {
-  //   const resp = await fetch("/api/user/remove", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ userOneId: id, userTwoId: user?.id }),
-  //   });
-  //   if (!resp.ok) {
-  //     const { messg } = await resp.json();
-  //     toast({ title: messg, variant: "destructive" });
-  //   } else {
-  //     const data = await resp.json();
-  //     toast({ title: data.messg });
-  //   }
-  // }
-
-  // unFriend
-  // async function unFriend() {
-  //   const resp = await fetch("/api/user/unfriend", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ userOneId: user?.id, userTwoId: id }),
-  //   });
-  //   if (!resp.ok) {
-  //     const { messg } = await resp.json();
-  //     toast({ title: messg, variant: "destructive" });
-  //   } else {
-  //     const data = await resp.json();
-  //     toast({ title: data.messg });
-  //   }
-  // }
-
   return (
     <div className="border border-border bg-background py-2 px-4 shadow-md rounded-md">
       <div className="ml-1 lg:text-xl mb-2">{name}</div>
       <div>
         {isFriend ? (
           <div className="flex items-center gap-x-2">
-            <Button onClick={() => {}} size={"sm"} variant={"outline"}>
-              View
-            </Button>
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <Button size={"sm"} variant={"outline"}>
+                  View
+                </Button>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <h1>email: {email}</h1>
+                <h1>name: {name}</h1>
+              </HoverCardContent>
+            </HoverCard>
+
             <UnfriendDialog
               button={
                 <Button size={"sm"} variant={"destructive"}>

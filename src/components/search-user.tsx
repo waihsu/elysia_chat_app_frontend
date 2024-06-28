@@ -15,9 +15,7 @@ export default function SearchUser() {
 
   async function getUsers() {
     const resp = await fetch(
-      `http://localhost:3000/api/user/search/${String(
-        user?.id
-      )}?name=${searchName}`
+      `/api/user/search/${String(user?.id)}?name=${searchName}`
     );
 
     if (!resp.ok) {

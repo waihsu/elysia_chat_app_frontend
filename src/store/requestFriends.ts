@@ -6,6 +6,8 @@ import { create } from "zustand";
 interface RequestFriendsState {
   requestFriends: User[];
   setRequestFriend: (friends: User[]) => void;
+  addedRequest: (user: User) => void;
+  removeRequest: (user: User) => void;
   removeRequestFriend: ({
     userOneId,
     userTwoId,
@@ -21,8 +23,20 @@ export const RequestFriends = create<RequestFriendsState>((set) => ({
   setRequestFriend: (friends: User[]) => {
     set({ requestFriends: friends });
   },
-
+  addedRequest: (user) => {
+    set((state) => ({ requestFriends: [...state.requestFriends, user] }));
+  },
+  removeRequest: (user) => {
+    set((state) => ({
+      requestFriends: state.requestFriends.filter(
+        (item) => item.id !== user.id
+      ),
+    }));
+  },
   removeRequestFriend: async function ({ userOneId, userTwoId }) {
+    const socket = new WebSocket(
+      `ws://localhost:3000/api/user/friends/${userOneId}`
+    );
     const resp = await fetch("/api/user/remove", {
       method: "POST",
       headers: {
@@ -36,11 +50,16 @@ export const RequestFriends = create<RequestFriendsState>((set) => ({
     } else {
       const { messg, user } = await resp.json();
       toast({ title: messg });
-      set((state) => ({
-        requestFriends: state.requestFriends.filter(
-          (item) => item.id !== user.id
-        ),
-      }));
+      if (user) {
+        socket.send(
+          JSON.stringify({ type: "removeFriendrequest", user: user.userTwo })
+        );
+        set((state) => ({
+          requestFriends: state.requestFriends.filter(
+            (item) => item.id !== user.userOne.id
+          ),
+        }));
+      }
     }
   },
 }));
