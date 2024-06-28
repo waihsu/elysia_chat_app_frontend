@@ -19,6 +19,7 @@ interface MediaRoomProps {
   video: boolean;
   audio: boolean;
   setOnCall: (value: boolean) => void;
+  setVideoCall: (value: boolean) => void;
 }
 
 export default function MediaRoom({
@@ -26,6 +27,7 @@ export default function MediaRoom({
   video,
   audio,
   setOnCall,
+  setVideoCall,
 }: MediaRoomProps) {
   const { user } = useAuthStore();
   const [token, setToken] = useState("");
@@ -77,8 +79,11 @@ export default function MediaRoom({
 
       <Button
         size={"icon"}
-        className="absolute top-0"
-        onClick={() => setOnCall(false)}
+        className="absolute top-4 left-4"
+        onClick={() => {
+          setOnCall(false);
+          setVideoCall(false);
+        }}
       >
         <LeaveIcon />
       </Button>

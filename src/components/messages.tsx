@@ -34,6 +34,8 @@ export default function Messages() {
   const { conversations } = ConversationsStore();
   const [messages, setMessages] = useState<MessageState[]>([]);
   const latestMessageRef = useRef<HTMLDivElement>(null);
+  const loadRef = useRef<HTMLDivElement>(null);
+
   const [videoCall, setVideoCall] = useState(false);
   const [audioCall, setAudioCall] = useState(false);
   const [onCall, setOnCall] = useState(false);
@@ -119,25 +121,23 @@ export default function Messages() {
     }
   }
 
-  function onSubmit(values: z.infer<typeof sendMessageSchema>) {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify(values));
-      form.reset();
-    } else {
-      console.log("WebSocket is not open. Queuing message.");
+  async function onSubmit(values: z.infer<typeof sendMessageSchema>) {
+    const resp = await fetch(`/api/messages/${params.id}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+    form.reset();
+    if (resp.ok) {
+      const { message } = await resp.json();
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(message));
+      } else {
+        console.log("WebSocket is not open. Queuing message.");
+      }
     }
-    // const resp = await fetch(`/api/messages/${params.id}`, {
-    //   method: "POST",
-    //   headers: {
-    //     "content-type": "application/json",
-    //   },
-    //   body: JSON.stringify(values),
-    // });
-    // form.reset();
-    // if (resp.ok) {
-    //   const { message } = await resp.json();
-    //   setMessages((pre) => [...pre, message]);
-    // }
   }
 
   return (
@@ -195,6 +195,7 @@ export default function Messages() {
             ref={latestMessageRef}
             className=" shadow-sm py-0  mb-6 flex flex-col space-y-3 overflow-y-scroll scrollbar-none  h-full px-2 "
           >
+            <h1 ref={loadRef}>hello</h1>
             {messages.map((message, index) => (
               <div key={index} className=" flex space-x-1 ">
                 {message.users.id !== user?.id ? (
@@ -259,6 +260,7 @@ export default function Messages() {
           audio={audioCall}
           video={videoCall}
           setOnCall={setOnCall}
+          setVideoCall={setVideoCall}
         />
       )}
     </ChatLayout>
